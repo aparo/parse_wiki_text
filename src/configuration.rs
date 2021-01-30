@@ -6,6 +6,9 @@
 ///
 /// This is generated using the program [`fetch_mediawiki_configuration`](https://github.com/portstrom/fetch_mediawiki_configuration).
 pub struct ConfigurationSource<'a> {
+    /// Maximum duration for parsing a source.
+    pub limit: std::time::Duration,
+
     /// Aliases of the category namespace.
     pub category_namespaces: &'a [&'a str],
 
@@ -46,6 +49,7 @@ impl crate::Configuration {
             protocols: crate::Trie::new(),
             redirect_magic_words: crate::Trie::new(),
             tag_name_map: crate::HashMap::new(),
+            limit: source.limit.clone(),
         };
         for (name, character) in crate::html_entities::HTML_ENTITIES {
             configuration
@@ -151,7 +155,7 @@ impl crate::Configuration {
 
     /// Parses wiki text into structured data.
     #[must_use]
-    pub fn parse<'a>(&self, wiki_text: &'a str) -> crate::Output<'a> {
+    pub fn parse<'a>(&self, wiki_text: &'a str) -> Result<crate::Output<'a>, crate::parse::Error> {
         crate::parse::parse(self, wiki_text)
     }
 }

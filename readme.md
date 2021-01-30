@@ -91,7 +91,7 @@ let wiki_text = concat!(
     "*Speed\n",
     "*Ergonomics"
 );
-let result = Configuration::default().parse(wiki_text);
+let result = Configuration::default().parse(wiki_text)?;
 assert!(result.warnings.is_empty());
 for node in result.nodes {
     if let Node::UnorderedList { items, .. } = node {

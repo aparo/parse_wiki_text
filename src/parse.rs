@@ -1,9 +1,30 @@
 // Copyright 2019 Fredrik Portström <https://portstrom.com>
 // This is free software distributed under the terms specified in
 // the file LICENSE at the top-level directory of this distribution.
+use std::time::Instant;
+
+#[derive(Debug)]
+pub enum Error {
+    Timeout,
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Parsing took too long")
+    }
+}
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
+}
 
 #[must_use]
-pub fn parse<'a>(configuration: &crate::Configuration, wiki_text: &'a str) -> crate::Output<'a> {
+pub fn parse<'a>(
+    configuration: &crate::Configuration,
+    wiki_text: &'a str,
+) -> Result<crate::Output<'a>, Error> {
     let mut state = crate::State {
         flushed_position: 0,
         nodes: vec![],
@@ -12,10 +33,14 @@ pub fn parse<'a>(configuration: &crate::Configuration, wiki_text: &'a str) -> cr
         warnings: vec![],
         wiki_text,
     };
+    let deadline = Instant::now() + configuration.limit;
     {
         let mut has_line_break = false;
         let mut position = 0;
         loop {
+            if deadline <= Instant::now() {
+                return Err(Error::Timeout);
+            }
             match state.get_byte(position) {
                 Some(b'\n') => {
                     if has_line_break {
@@ -41,6 +66,9 @@ pub fn parse<'a>(configuration: &crate::Configuration, wiki_text: &'a str) -> cr
     }
     crate::line::parse_beginning_of_line(&mut state, None);
     loop {
+        if deadline <= Instant::now() {
+            return Err(Error::Timeout);
+        }
         match state.get_byte(state.scan_position) {
             None => {
                 crate::line::parse_end_of_line(&mut state);
@@ -201,8 +229,8 @@ pub fn parse<'a>(configuration: &crate::Configuration, wiki_text: &'a str) -> cr
     }
     let end_position = state.skip_whitespace_backwards(wiki_text.len());
     state.flush(end_position);
-    crate::Output {
+    Ok(crate::Output {
         nodes: state.nodes,
         warnings: state.warnings,
-    }
+    })
 }

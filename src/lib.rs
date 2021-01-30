@@ -85,7 +85,7 @@
 //!     "*Speed\n",
 //!     "*Ergonomics"
 //! );
-//! let result = Configuration::default().parse(wiki_text);
+//! let result = Configuration::default().parse(wiki_text).unwrap();
 //! assert!(result.warnings.is_empty());
 //! # let mut found = false;
 //! for node in result.nodes {
@@ -131,7 +131,9 @@ mod warning;
 
 pub use configuration::ConfigurationSource;
 use configuration::Namespace;
+pub use parse::Error;
 use state::{OpenNode, OpenNodeType, State};
+use std::time::Duration;
 use std::{
     borrow::Cow,
     collections::{HashMap, HashSet},
@@ -150,6 +152,7 @@ pub struct Configuration {
     protocols: Trie<()>,
     redirect_magic_words: Trie<()>,
     tag_name_map: HashMap<String, TagClass>,
+    limit: Duration,
 }
 
 /// List item of a definition list.
