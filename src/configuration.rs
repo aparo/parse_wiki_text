@@ -81,7 +81,7 @@ impl crate::Configuration {
     for tag_name in source.extension_tags {
       configuration
         .tag_name_map
-        .insert(tag_name.to_string(), crate::TagClass::ExtensionTag);
+        .insert((*tag_name).to_string(), crate::TagClass::ExtensionTag);
     }
     for tag_name in [
       "abbr",
@@ -146,7 +146,7 @@ impl crate::Configuration {
     {
       configuration
         .tag_name_map
-        .insert(tag_name.to_string(), crate::TagClass::Tag);
+        .insert((*tag_name).to_string(), crate::TagClass::Tag);
     }
     configuration
   }

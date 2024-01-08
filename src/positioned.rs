@@ -84,3 +84,23 @@ impl<'a> crate::Positioned for crate::Node<'a> {
     }
   }
 }
+
+// This assumes that the slice is not empty and that the start and end values
+// of its elements are in order.
+impl<P: crate::Positioned> crate::Positioned for [P] {
+  fn end(&self) -> usize {
+    if let Some(node) = self.last() {
+      node.end()
+    } else {
+      0
+    }
+  }
+
+  fn start(&self) -> usize {
+    if let Some(node) = self.first() {
+      node.start()
+    } else {
+      0
+    }
+  }
+}

@@ -548,11 +548,8 @@ pub fn start_table(state: &mut crate::State, position_before_line_break: Option<
   }
   state.flushed_position = state.scan_position;
   let mut position = state.scan_position + 2;
-  loop {
-    match state.get_byte(position) {
-      Some(b'\t') | Some(b' ') => position += 1,
-      _ => break,
-    }
+  while let Some(b'\t') | Some(b' ') = state.get_byte(position) {
+    position += 1;
   }
   state.push_open_node(
     crate::OpenNodeType::Table(crate::state::Table {

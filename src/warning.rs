@@ -2,10 +2,13 @@
 // This is free software distributed under the terms specified in
 // the file LICENSE at the top-level directory of this distribution.
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Warning from the parser telling that something is not well-formed.
 #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Warning {
   /// The byte position in the wiki text where the warning ends.
   pub end: usize,
@@ -19,6 +22,7 @@ pub struct Warning {
 
 /// Identifier for a kind of warning from the parser.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum WarningMessage {
   /// List broken by definition term.
   DefinitionTermContinuation,

@@ -31,7 +31,6 @@ pub fn parse_external_link_start(state: &mut crate::State, configuration: &crate
   match configuration.protocols.find(&state.wiki_text[scheme_start_position..]) {
     Err(_) => {
       state.scan_position = scheme_start_position;
-      return;
     }
     Ok(_) => {
       state.push_open_node(crate::OpenNodeType::ExternalLink, scheme_start_position);
